@@ -52,6 +52,7 @@ public class GUI extends JFrame implements ActionListener {
                 File file_path = new File(this.file_name);
                 PDFReader pdfReader = new PDFReader(this.file_name);
                 label.setText(pdfReader.getReadInPDF());
+                GraduateStudent gradStudent = new GraduateStudent(pdfReader.getReadInPDF());
 
                 System.out.println(file_path.getAbsoluteFile());
             }

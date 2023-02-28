@@ -14,10 +14,8 @@ public class PDFReader{
     /**
      * Constructor 
      */
-    public PDFReader(String fileName){
-        //setFileName(this.fileName);  
+    public PDFReader(String fileName){  
         readPDF(fileName); 
-        //scanner.close(); // Close Scanner
     } 
 
     /**
