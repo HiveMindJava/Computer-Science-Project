@@ -3,7 +3,7 @@
  */
 public class MainDriver{
     public static void main(String[] args){
-        new GUI();
+        new FileSearchWindow();
 
         do {
             //PDFReader pdfReader = new PDFReader();
