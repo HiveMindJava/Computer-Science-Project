@@ -80,7 +80,7 @@ public class PDFReader{
         else if (inputFileName.endsWith(FILE_EXTENSION)) 
         {
             // Check that input contains only valid characters for PDF file names
-            if (inputFileName.matches("^(?!.*[/\\\\:*?\"<>|])[a-zA-Z0-9 _(),.-]+\\.pdf$")) 
+            if (inputFileName.matches("^(.*[/\\\\:*?\"<>|])[a-zA-Z0-9 _(),.-]+\\.pdf$")) 
             {
                 return inputFileName;
             }
@@ -106,11 +106,14 @@ public class PDFReader{
     public void readPDF(String fileName){
         try (PDDocument document = PDDocument.load(new File(fileName))){
             // Extract the text from the PDF file
+            Parsing myParsing = new Parsing();
             PDFTextStripper textStripper = new PDFTextStripper();
             setReadInPDF(textStripper.getText(document));
             
             // Print the extracted text
             System.out.println(getReadInPDF());
+            Vector<Vector<String>> myCourses = new Vector<Vector<String>>(myParsing.parseTranscript(getReadInPDF()));
+            myParsing.printCourses(myCourses);
         } catch (IOException e){
             System.out.println();
             System.out.println("An error has occurred! Most likely you have entered a filename of a file that doesn't exist or cannot be found.");
