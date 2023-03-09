@@ -167,23 +167,23 @@ public class ParsingAlgorithm{
         }
     }
     
-public void removeDuplicates() {
-    HashMap<String, Course> courseMap = new HashMap<>(); // Key: Course key, Value: Course
+    public void removeDuplicates() {
+        HashMap<String, Course> courseMap = new HashMap<>(); // Key: Course key, Value: Course
 
-    for (Course course : courses) {
-        String courseKey = course.getDepartment() + course.getCourseNumber();
-        Course existingCourse = courseMap.get(courseKey);
+        for (Course course : courses) {
+            String courseKey = course.getDepartment() + course.getCourseNumber();
+            Course existingCourse = courseMap.get(courseKey);
 
-        if (existingCourse == null ||
-            (!existingCourse.getLetterGrade().equals("") &&
-             (course.getLetterGrade().equals("") ||
-              course.getSemester().compareTo(existingCourse.getSemester()) > 0))) {
-            courseMap.put(courseKey, course);
+            if (existingCourse == null ||
+                (!existingCourse.getLetterGrade().equals("") &&
+                (course.getLetterGrade().equals("") ||
+                course.getSemester().compareTo(existingCourse.getSemester()) > 0))) {
+                courseMap.put(courseKey, course);
+            }
         }
-    }
 
-    courses = new ArrayList<>(courseMap.values()); // Update the ArrayList of courses to remove duplicates
-}
+        courses = new ArrayList<>(courseMap.values()); // Update the ArrayList of courses to remove duplicates
+    }
     
     public void printCourses(){
         System.out.println("Courses:");
