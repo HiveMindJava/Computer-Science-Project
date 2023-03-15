@@ -18,13 +18,21 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 
 public class PreViewWindow {
+
     private String typeOfDegreePlan = "Intelligent Systems";
     private int degreePlanSection;
     final private String CORE_COURSES_LABEL = "CORE COURSES    (15 Credit Hours)   3.19 Grade Point Average Required";
     final private String APPROVED_6000_LEVEL_ELECTIVES_LABEL = "FIVE APPROVED 6000 LEVEL ELECTIVES    (15 * Credit Hours)    3.0 Grade Point Average";
     final private String ADDITIONAL_ELECTIVES_LABEL = "Additional Electives (3 Credit Hours Minimum)";
     final private String OTHER_REQUIREMENTS = "Other Requirements";
-    final private String CYBER_SECURITY = "Cyber Security"; 
+    final private String CYBER_SECURITY = "Cyber Security";
+    final private String DATA_SCIENCE = "Data Science";
+    final private String INTELLIGENT_SYSTEMS = "Intelligent Systems";
+    final private String INTERACTIVE_COMPUTING = "Interactive Computing";
+    final private String NETWORKS_AND_TELECOMMUNICATIONS = "Networks and Telecommunications";
+    final private String SYSTEMS = "Systems";
+    final private String TRADITIONAL_COMPUTER_SCIENCE = "Traditional Computer Science";
+    final private String SOFTWARE_ENGINEERING = "Software Engineering";
     private ArrayList<Course> coursesList;
 
     public void labelsForTables(int intFlag, int degreePlanSection, JPanel labelPanel) {
@@ -34,19 +42,19 @@ public class PreViewWindow {
                 label = new JLabel(CORE_COURSES_LABEL);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 1) {
-                if (typeOfDegreePlan.equals("Data Science") || typeOfDegreePlan.equals("Intelligent Systems") || typeOfDegreePlan.equals("Systems")) {
+                if (typeOfDegreePlan.equals(DATA_SCIENCE) || typeOfDegreePlan.equals(INTELLIGENT_SYSTEMS) || typeOfDegreePlan.equals(SYSTEMS)) {
                     label = new JLabel("One of the Following Courses");
-                } else if (typeOfDegreePlan.equals("Interactive Computing")) {
+                } else if (typeOfDegreePlan.equals(INTERACTIVE_COMPUTING)) {
                     label = new JLabel("Three of the Following Courses");
-                } else if (typeOfDegreePlan.equals("Traditional Computer Science")) {
+                } else if (typeOfDegreePlan.equals(TRADITIONAL_COMPUTER_SCIENCE)) {
                     label = new JLabel("Two of the Following Courses");
                 }
 
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 2) {
                 label = new JLabel(APPROVED_6000_LEVEL_ELECTIVES_LABEL);
                 labelPanel.add(label, BorderLayout.NORTH);
@@ -55,44 +63,44 @@ public class PreViewWindow {
                 label = new JLabel(ADDITIONAL_ELECTIVES_LABEL);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 4) {
                 label = new JLabel(OTHER_REQUIREMENTS);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             }
         } else if (intFlag == 2) {
             if (degreePlanSection == 0) {
                 label = new JLabel(CORE_COURSES_LABEL);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 1) {
                 label = new JLabel("Two of the Following Courses");
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 2) {
                 label = new JLabel("TWO IA* APPROVED 6000 LEVEL ELECTIVES   (6 Credit Hours)   3.0 Grade Point Average");
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 3) {
                 label = new JLabel("CS APPROVED 6000 LEVEL ELECTIVES   (12 Credit Hours)   3.0 Grade Point Average");
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 4) {
                 label = new JLabel(OTHER_REQUIREMENTS);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             } else if (degreePlanSection == 5) {
                 label = new JLabel("No 5XXX courses can be applied to this degree plan");
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
+
             }
         } else if (intFlag == 3) {
             if (degreePlanSection == 0) {
@@ -104,7 +112,7 @@ public class PreViewWindow {
                 label = new JLabel(APPROVED_6000_LEVEL_ELECTIVES_LABEL);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                if (typeOfDegreePlan.equals("Software Engineering")) {
+                if (typeOfDegreePlan.equals(SOFTWARE_ENGINEERING)) {
                     label = new JLabel("CS 6359 cannot be used on this degree plan");
                     labelPanel.add(label, BorderLayout.CENTER);
                 }
@@ -118,7 +126,6 @@ public class PreViewWindow {
                 label = new JLabel(OTHER_REQUIREMENTS);
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // add some padding to the top
-                //panel.add(labelPanel, BorderLayout.NORTH);
             }
         }
     }
@@ -200,59 +207,56 @@ public class PreViewWindow {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel tableContainer = new JPanel(new GridLayout(0, 1));
-        if (typeOfDegreePlan.equals("Data Science") || typeOfDegreePlan.equals("Intelligent Systems") || typeOfDegreePlan.equals("Interactive Computing")
-                || typeOfDegreePlan.equals("Systems") || typeOfDegreePlan.equals("Traditional Computer Science")) {
-            JPanel[] tablePanels = new JPanel[6];
+        if (typeOfDegreePlan.equals(DATA_SCIENCE) || typeOfDegreePlan.equals(INTELLIGENT_SYSTEMS) || typeOfDegreePlan.equals(INTERACTIVE_COMPUTING)
+                || typeOfDegreePlan.equals(SYSTEMS) || typeOfDegreePlan.equals(TRADITIONAL_COMPUTER_SCIENCE)) {
+            final int numberOfTables = 6;
+            JPanel[] tablePanels = new JPanel[numberOfTables];
             intFlag = 1;
-// Create the first table panel (with headers) and add it to the array
-            //tablePanels[0] = createTablePanel(degreePlanSection = "First Section");
 
-// Create the remaining table panels (without headers) and add them to the array
-            for (int i = 0; i < tablePanels.length; i++) {
-                tablePanels[i] = createTablePanel(intFlag, i);
+            // Create the remaining table panels (without headers) and add them to the array
+            for (int ix = 0; ix < tablePanels.length; ix++) {
+                tablePanels[ix] = createTablePanel(intFlag, ix);
             }
 
-// Add the table panels to the table container
+            // Add the table panels to the table container
             for (int i = 0; i < tablePanels.length; i++) {
                 tableContainer.add(tablePanels[i]);
             }
 
-// Add the table container to the main panel
+            // Add the table container to the main panel
             mainPanel.add(tableContainer, BorderLayout.CENTER);
-        } else if (typeOfDegreePlan.equals("Cyber Security")) {
-            JPanel[] tablePanels = new JPanel[6];
+        } else if (typeOfDegreePlan.equals(CYBER_SECURITY)) {
+            final int numberOfTables = 6;
+            JPanel[] tablePanels = new JPanel[numberOfTables];
             intFlag = 2;
-// Create the first table panel (with headers) and add it to the array
-            //tablePanels[0] = createTablePanel();
 
-// Create the remaining table panels (without headers) and add them to the array
-            for (int i = 1; i < tablePanels.length; i++) {
-                tablePanels[i] = createTablePanel(intFlag, i);
+            // Create the remaining table panels (without headers) and add them to the array
+            for (int ix = 1; ix < tablePanels.length; ix++) {
+                tablePanels[ix] = createTablePanel(intFlag, ix);
             }
 
-// Add the table panels to the table container
-            for (int i = 0; i < tablePanels.length; i++) {
-                tableContainer.add(tablePanels[i]);
+            // Add the table panels to the table container
+            for (int ix = 0; ix < tablePanels.length; ix++) {
+                tableContainer.add(tablePanels[ix]);
             }
 
-// Add the table container to the main panel
+            // Add the table container to the main panel
             mainPanel.add(tableContainer, BorderLayout.CENTER);
-        } else if (typeOfDegreePlan.equals("Networks and Telecommunication") || typeOfDegreePlan.equals("Software Engineering")) {
-            JPanel[] tablePanels = new JPanel[5];
+        } else if (typeOfDegreePlan.equals(NETWORKS_AND_TELECOMMUNICATIONS) || typeOfDegreePlan.equals(SOFTWARE_ENGINEERING)) {
+            final int numberOfTables = 5; 
+            JPanel[] tablePanels = new JPanel[numberOfTables];
             intFlag = 3;
-// Create the first table panel (with headers) and add it to the array
-            //tablePanels[0] = createTablePanel();
 
-// Create the remaining table panels (without headers) and add them to the array
-            for (int i = 1; i < tablePanels.length; i++) {
-                tablePanels[i] = createTablePanel(intFlag, i);
+            // Create the remaining table panels (without headers) and add them to the array
+            for (int ix = 1; ix < tablePanels.length; ix++) {
+                tablePanels[ix] = createTablePanel(intFlag, ix);
             }
 
-// Add the table panels to the table container
-            for (int i = 0; i < tablePanels.length; i++) {
-                tableContainer.add(tablePanels[i]);
+            // Add the table panels to the table container
+            for (int ix = 0; ix < tablePanels.length; ix++) {
+                tableContainer.add(tablePanels[ix]);
             }
-// Add the table container to the main panel
+            // Add the table container to the main panel
             mainPanel.add(tableContainer, BorderLayout.CENTER);
         }
 
