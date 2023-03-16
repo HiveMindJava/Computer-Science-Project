@@ -6,12 +6,7 @@ public class TableModel extends AbstractTableModel {
     private String[][] data = {{"Cell 1,1", "Cell 1,2"}, {"Cell 2,1", "Cell 2,2"}};
     private String[] columnNames = {"Column 1", "Column 2"};
 
-//    public TableModel(String[][] data, String[] columnNames) {
-//        this.data = data;
-//        this.columnNames = columnNames;
-//    }
-    
-        public TableModel() {
+    public TableModel() {
         this.data = data;
         this.columnNames = columnNames;
     }
@@ -75,5 +70,5 @@ public class TableModel extends AbstractTableModel {
             System.out.println();
         }
     }
-    
+
 }

@@ -1,4 +1,3 @@
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -15,9 +14,12 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JLabel;
-
+/**
+ * This class is primarily used to display the pre-view of the selected Degree Plan using a JFrame, 
+ * but it is also used to get some user input through a separate JFrame. 
+ * 
+ */
 public class PreViewWindow{
-
     private String typeOfDegreePlan = "Intelligent Systems"; // Variable will contain the type of degree plan selected by the user 
     final private String CORE_COURSES_LABEL = "CORE COURSES    (15 Credit Hours)   3.19 Grade Point Average Required";
     final private String APPROVED_6000_LEVEL_ELECTIVES_LABEL = "FIVE APPROVED 6000 LEVEL ELECTIVES    (15 * Credit Hours)    3.0 Grade Point Average";

@@ -13,7 +13,7 @@ public class Course{
     private String semester; 
     private String transferType; 
     private String levelingCourseDisposition = ""; // Variable could be initialized to "Completed", "Waived", "Not required by plan or electives", or "Other"
-    //private String degreePlanSection = ""; // Variable could be initialized to "", "", ""
+    private String degreePlanSection = ""; // Variable could be initialized to "Core Courses", "X of the Following Courses", or "Admission Prerequisites"
     private String repeatCourse = ""; // This variable contains the String "Repeat Excluded" if a course has been taken once before. Default is empty String
      
     /**
@@ -41,6 +41,13 @@ public class Course{
     this.points = points;
     this.semester = semester;
     this.transferType = transferType; 
+    }
+    
+    public Course(String department, String courseNumber, String className, String degreePlanSection){
+        this.department = department;
+        this.courseNumber = courseNumber;
+        this.className = className;
+        this.degreePlanSection = degreePlanSection;
     }
     
     /**
@@ -178,5 +185,33 @@ public class Course{
      */
     public void setRepeatCourse(String repeatCourse){
         this.repeatCourse = repeatCourse;
+    }
+
+    /**
+     * @return the levelingCourseDisposition
+     */
+    public String getLevelingCourseDisposition(){
+        return levelingCourseDisposition;
+    }
+
+    /**
+     * @param levelingCourseDisposition the levelingCourseDisposition to set
+     */
+    public void setLevelingCourseDisposition(String levelingCourseDisposition){
+        this.levelingCourseDisposition = levelingCourseDisposition;
+    }
+
+    /**
+     * @return the degreePlanSection
+     */
+    public String getDegreePlanSection(){
+        return degreePlanSection;
+    }
+
+    /**
+     * @param degreePlanSection the degreePlanSection to set
+     */
+    public void setDegreePlanSection(String degreePlanSection){
+        this.degreePlanSection = degreePlanSection;
     }
 }
