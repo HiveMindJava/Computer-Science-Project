@@ -15,7 +15,7 @@ public class ConvertToWord {
  
         // Writing the Document in file system
         FileOutputStream out = new FileOutputStream(
-            new File("createTest_table.docx"));
+            new File("createTest2_table.docx"));
  
         // Creating a table
         XWPFTable table = document.createTable();
@@ -59,6 +59,7 @@ public class ConvertToWord {
         tableRowFour.getCell(2).setText("          ");
         tableRowFour.getCell(3).setText("          ");
         tableRowFour.getCell(4).setText("          ");
+        setCellColor(tableRowFour);
 
 
         // Creating five blank rows
@@ -293,6 +294,14 @@ public class ConvertToWord {
         // all data to the rows are inserted
         System.out.println(
             "create_table.docx written successfully");
+    }
+
+    public static void setCellColor(XWPFTableRow row){
+        int size = row.getTableCells().size();
+        for(int i = 0; i < size; i++){
+            row.getCell(i).setColor("d4d404");
+        }
+        System.out.println("Changed color to yellow");
     }
     /*public static void readFile(String filePath) {
         try{
