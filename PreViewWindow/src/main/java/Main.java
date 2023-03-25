@@ -36,11 +36,11 @@ public class Main {
         courses.add(course3);
         courses.add(course4);
 
-        //PreViewWindow preViewWindow = new PreViewWindow(courses);
-        File txtFile; // Variable will only be used to open the DefaultCourses.txt file 
 
-        // Open a TXT file named DefaultCourses.txt
-        txtFile = new File("DefaultCourses.txt"); // File is located amongst the program folders 
+        File txtFile; // Variable will only be used to open the Default.txt file 
+
+        // Open a TXT file named Default.txt
+        txtFile = new File("Default.txt"); // File is located amongst the program folders 
 
         if (txtFile.exists() && txtFile.isFile() && txtFile.getName().endsWith(".txt")) // Check if the file exists, is a file (not a directory), and has a ".txt" extension 
         {
@@ -56,14 +56,18 @@ public class Main {
             bufferedReader.close(); // Close BufferedReader
             readInTxt = sringBuilder.toString(); // Store the contents of the file
         } else {
-            System.out.println("DefaultCourses.txt file not found.");
+            System.out.println("Default.txt file not found.");
             System.out.println("Application has terminated due to error. Goodbye!");
             System.exit(0);
         }
 
         ParsingAlgorithms parseTXTFILE = new ParsingAlgorithms();
+        parseTXTFILE.parseDefaultTracks(readInTxt);
+        parseTXTFILE.parseDefaultLeveling(readInTxt);      
         parseTXTFILE.parseDefaultCourses(readInTxt);
-        parseTXTFILE.printHashMap();
+        
+        PreViewWindow window = new PreViewWindow(courses, parseTXTFILE.getDefaultCSTracks(), parseTXTFILE.getDefaultSETracks(), parseTXTFILE.getDefaultLeveling(),parseTXTFILE.getDefaultCoursesMap()); 
+        //parseTXTFILE.printHashMap();
 
     }
 

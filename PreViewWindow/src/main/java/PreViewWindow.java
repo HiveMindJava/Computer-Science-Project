@@ -11,6 +11,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -33,16 +34,24 @@ public class PreViewWindow{
     final private String SYSTEMS = "Systems";
     final private String TRADITIONAL_COMPUTER_SCIENCE = "Traditional Computer Science";
     final private String SOFTWARE_ENGINEERING = "Software Engineering";
+    private ArrayList<String> defaultCSTracks = new ArrayList<>(); // ArrayList will store the CS tracks available 
+    private ArrayList<String> defaultSETracks = new ArrayList<>(); // ArrayList will store the SE tracks available 
+    private ArrayList<String> defaultLeveling = new ArrayList<>(); // ArrayList will store the leveling courses/pre-requisites that are possible 
     private ArrayList<Course> coursesList; // ArrayList contains all the courses read-in from the transcript after some filtering
-
+    private HashMap<String, ArrayList<Course>> defaultCoursesMap; // Hashmap stores the default courses found in the Default.txt file
+                                                                  // with the key being the type of track the courses fall under 
     /**
      * Constructor. 
      * 
      * @param courses 
      */
-    public PreViewWindow(ArrayList<Course> courses){
+    public PreViewWindow(ArrayList<Course> courses, ArrayList<String> defaultCSTracks, ArrayList<String> defaultSETracks, ArrayList<String> defaultLeveling, 
+            HashMap<String, ArrayList<Course>> hashMap){
         this.coursesList = new ArrayList<>(courses); 
-        
+        this.defaultCSTracks = new ArrayList<String>(defaultCSTracks);
+        this.defaultSETracks = new ArrayList<String>(defaultSETracks);
+        this.defaultLeveling = new ArrayList<String>(defaultLeveling);    
+        this.defaultCoursesMap = new HashMap<String, ArrayList<Course>>(hashMap); 
         createFrameAndTables();
     }
 
@@ -51,7 +60,7 @@ public class PreViewWindow{
      * 
      */
     public void createFrameAndTables(){
-        JFrame frame = new JFrame("Pre-view of Degree Plan"); // Creates a new JFrame. This will act as my sole frame to display the 
+        JFrame frame = new JFrame("Pre-view of Degree Plan"); // Creates a new JFrame. This will act as the sole frame to display the 
                                                               // pre-view of the needed Degree Plan  
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         int intFlag; // Variable is a integer flag used to distinguish between groups of degree plan types  

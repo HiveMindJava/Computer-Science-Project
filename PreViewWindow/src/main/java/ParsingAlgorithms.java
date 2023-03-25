@@ -15,8 +15,11 @@ public class ParsingAlgorithms{
     private String appliedIn; // Variable holds the semester addmited into program 
     private String major; // Variable holds the major the graduate student is in (Computer Science or Software Engineering)
     private Course course; // Variable holds a course 
-    private ArrayList<Course> coursesArray = new ArrayList<>(); // ArrayList of Courses, courses read-in from transcriptData are stored here
-    private HashMap<String, ArrayList<Course>> defaultCoursesMap = new HashMap<>(); // Hashmap stores the default courses found in the DefaultCourses file
+    private ArrayList<String> defaultCSTracks = new ArrayList<>(); // ArrayList will store the CS tracks available 
+    private ArrayList<String> defaultSETracks = new ArrayList<>(); // ArrayList will store the SE tracks available 
+    private ArrayList<String> defaultLeveling = new ArrayList<>(); // ArrayList will store the leveling courses/pre-requisites that are possible 
+    private ArrayList<Course> coursesArray = new ArrayList<>(); // ArrayList of Courses, valid courses read-in from transcriptData are stored here
+    private HashMap<String, ArrayList<Course>> defaultCoursesMap = new HashMap<>(); // Hashmap stores the default courses found in the Default.txt file
                                                                                     // with the key being the type of track the courses fall under 
 
     /**
@@ -27,8 +30,8 @@ public class ParsingAlgorithms{
     public void parseTranscript(String transcriptData){
         String semester = ""; // Variable holds the semester the course was taken in 
         String transferType = ""; // Variable holds the transfer type of the course (Transfer or Fast Track)
-        Boolean flagBGR = false; // Flag is used to signal if the "Beginning of Graduate Record" (BGR) has began to be parsed, variable is true if it has  
-        Boolean flagProgram = false; // Flag is used to signal if the program "Master" has began to be parsed 
+        boolean flagBGR = false; // Flag is used to signal if the "Beginning of Graduate Record" (BGR) has began to be parsed, variable is true if it has  
+        boolean flagProgram = false; // Flag is used to signal if the program "Master" has began to be parsed 
         
         try (Scanner scanner = new Scanner(transcriptData)){
             // Regular expressions to match patterns in transcript data
@@ -168,11 +171,13 @@ public class ParsingAlgorithms{
     }
     
     /**
-     * Method is used to parse through the default courses data and extract relevant information.
+     * Method is used to parse through the TXT data and extract relevant course information relating to the specific track.
+     * Note that the term "default" is dependent on how the degree plan and audit report are being created, in other words
+     * did the user select to generate said files from the PDF or the TXT option in the beginning of the program. 
      * 
-     * @param defaultCoursesData 
+     * @param defaultData 
      */
-    public void parseDefaultCourses(String defaultCoursesData){   
+    public void parseDefaultCourses(String defaultData){   
         String track = ""; // Variable holds the type of track  
         String degreePlanSection = ""; // Variable holds the corresponding degree plan section 
         ArrayList<Course> tempCoursesArray = new ArrayList<>(); // tempCoursesArray holds the default courses for the respective track 
@@ -182,16 +187,16 @@ public class ParsingAlgorithms{
         final String X_FOLLOWING_COURSES = "X of the Following Courses";
         final String ADMISSION_PRE_REQ = "Admission Prerequisites";
         
-        try (Scanner scanner = new Scanner(defaultCoursesData)){
-            // Regular expressions to match patterns in default courses data
+        try (Scanner scanner = new Scanner(defaultData)){
+            // Regular expressions to match patterns in default data
             Pattern trackPattern = Pattern.compile("^Track:\\s+(.+)$");
             Pattern courseDataPattern = Pattern.compile("^\\s*(.+?)\\s+-*\\s*(CS|SE)\\s+-*\\s*(\\d{4})\\s*$");
   
-            while (scanner.hasNextLine()) // While-loop iterates through the entirety of the default courses data
+            while (scanner.hasNextLine()) // While-loop iterates through the entirety of the default data
             {
                 String line = scanner.nextLine().trim();  
                 
-                // Regular expression matchers to extract relevant information from default courses data
+                // Regular expression matchers to extract relevant information from default data
                 Matcher trackMatcher = trackPattern.matcher(line);
                 Matcher courseDataMatcher = courseDataPattern.matcher(line);
                 
@@ -234,6 +239,79 @@ public class ParsingAlgorithms{
         // This will add the very last track and contents of the tempCoursesArray into the defaultCoursesMap due to the while-loop ending
         getDefaultCoursesMap().put(track, new ArrayList<>(tempCoursesArray)); 
         tempCoursesArray.clear();
+    }
+    
+    /**
+     * Method is used to parse through the TXT data and extract all the tracks available.
+     * Note that the term "default" is dependent on how the degree plan and audit report are being created, in other words
+     * did the user select to generate said files from the PDF or the TXT option in the beginning of the program. 
+     * 
+     * @param defaultData 
+     */
+    public void parseDefaultTracks(String defaultData){
+        final String LINE1 = "*********************DO NOT REMOVE THIS LINE 1*********************";
+        String flag = ""; // Variable is used to distinguish between CS or SE tracks 
+        
+        try (Scanner scanner = new Scanner(defaultData)){
+            while (scanner.hasNextLine()) // While-loop iterates through the entirety of the default data
+            {
+                String line = scanner.nextLine().trim();
+                
+                if (line.equals(LINE1)) // Executes when all the CS and SE tracks have been stored 
+                {
+                    break; 
+                }
+                else if (line.contains("Computer Science Tracks"))
+                {
+                    flag = "CS"; 
+                }
+                else if (line.contains("Software Engineering Tracks"))
+                {
+                    flag = "SE";
+                }
+                else if (flag.equals("CS") && !(line.isEmpty()))
+                {
+                    getDefaultCSTracks().add(line);
+                }
+                else if (flag.equals("SE") && !(line.isEmpty()))
+                {
+                    getDefaultSETracks().add(line);
+                }
+            }
+        }
+               
+    }
+    
+    /**
+     * Method is used to parse through the TXT data and extract all the leveling courses/pre-requisites that are possible.
+     * Note that the term "default" is dependent on how the degree plan and audit report are being created, in other words
+     * did the user select to generate said files from the PDF or the TXT option in the beginning of the program. 
+     * 
+     * @param defaultData 
+     */
+    public void parseDefaultLeveling(String defaultData){
+        final String LINE2 = "*********************DO NOT REMOVE THIS LINE 2*********************";
+        boolean flag = false; // Variable is used to signal when leveling courses/pre-requisites can start being stored 
+        
+        try (Scanner scanner = new Scanner(defaultData)){
+            while (scanner.hasNextLine()) // While-loop iterates through the entirety of the default data
+            {
+                String line = scanner.nextLine().trim();
+                
+                if (line.equals(LINE2)) // Executes when all the leveling courses/pre-requisites have been stored 
+                {
+                    break; 
+                }
+                else if(line.contains("Leveling Courses/Pre-requisites Assigned at Admission")) 
+                {
+                    flag = true; 
+                }
+                else if (flag && !(line.isEmpty()))
+                {
+                    getDefaultLeveling().add(line);
+                }
+            }
+        }
     }
     
     /**
@@ -418,5 +496,47 @@ public class ParsingAlgorithms{
      */
     public HashMap<String, ArrayList<Course>> getDefaultCoursesMap(){
         return defaultCoursesMap;
+    }
+
+    /**
+     * @return the defaultCSTracks
+     */
+    public ArrayList<String> getDefaultCSTracks() {
+        return defaultCSTracks;
+    }
+
+    /**
+     * @param defaultCSTracks the defaultCSTracks to set
+     */
+    public void setDefaultCSTracks(ArrayList<String> defaultCSTracks) {
+        this.defaultCSTracks = defaultCSTracks;
+    }
+
+    /**
+     * @return the defaultSETracks
+     */
+    public ArrayList<String> getDefaultSETracks() {
+        return defaultSETracks;
+    }
+
+    /**
+     * @param defaultSETracks the defaultSETracks to set
+     */
+    public void setDefaultSETracks(ArrayList<String> defaultSETracks) {
+        this.defaultSETracks = defaultSETracks;
+    }
+
+    /**
+     * @return the defaultLeveling
+     */
+    public ArrayList<String> getDefaultLeveling() {
+        return defaultLeveling;
+    }
+
+    /**
+     * @param defaultLeveling the defaultLeveling to set
+     */
+    public void setDefaultLeveling(ArrayList<String> defaultLeveling) {
+        this.defaultLeveling = defaultLeveling;
     }
 }
