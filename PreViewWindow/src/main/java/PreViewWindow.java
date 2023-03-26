@@ -7,6 +7,7 @@ import javax.swing.JButton;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,7 +15,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
 /**
  * This class is primarily used to display the pre-view of the selected Degree Plan using a JFrame, 
  * but it is also used to get some user input through a separate JFrame. 
@@ -22,6 +26,7 @@ import javax.swing.JLabel;
  */
 public class PreViewWindow{
     private String typeOfDegreePlan = "Intelligent Systems"; // Variable will contain the type of degree plan selected by the user 
+    private String fastTrackORThesis = ""; // Variable stores the users input for either Fast Track or Thesis
     final private String CORE_COURSES_LABEL = "CORE COURSES    (15 Credit Hours)   3.19 Grade Point Average Required";
     final private String APPROVED_6000_LEVEL_ELECTIVES_LABEL = "FIVE APPROVED 6000 LEVEL ELECTIVES    (15 * Credit Hours)    3.0 Grade Point Average";
     final private String ADDITIONAL_ELECTIVES_LABEL = "Additional Electives (3 Credit Hours Minimum)";
@@ -52,9 +57,75 @@ public class PreViewWindow{
         this.defaultSETracks = new ArrayList<String>(defaultSETracks);
         this.defaultLeveling = new ArrayList<String>(defaultLeveling);    
         this.defaultCoursesMap = new HashMap<String, ArrayList<Course>>(hashMap); 
-        createFrameAndTables();
+        
+        SwingUtilities.invokeLater(() -> {
+            createUserInputFrame();
+        });
+        
+//        SwingUtilities.invokeLater(() -> {
+//            createFrameAndTables();
+//        });
     }
 
+    /**
+     * Method creates one frame and said frame creates the capability to get user input.
+     * 
+     */
+    public void createUserInputFrame(){
+        JFrame frame = new JFrame("User Input Frame"); // Creates a new JFrame. This will act as the sole frame to display the 
+                                                       // frame that will accept user input  
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());  // Create a new JPanel to act as my main panel in the frame
+        //JPanel container = new JPanel(new GridLayout(3, 2)); // Creates a new JPanel with a GridLayout of two columns and three rows.
+        
+        mainPanel.add(fastTrackORThesis(), BorderLayout.NORTH);
+        
+        frame.getContentPane().add(mainPanel); // Add the mainPanel to the content pane of the JFrame
+        frame.pack(); // Pack the frame, which sets its size to the preferred size of its components
+        frame.setVisible(true); // Make the frame visible 
+        
+    }
+    
+    /**
+     * Method is used to create radio buttons that will store the users choice of either Fast Track or Thesis.
+     * 
+     * @return the radio button panel  
+     */
+    public JPanel fastTrackORThesis(){
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Create new JPanel, will house the radio buttons 
+        
+        // Create radio buttons 
+        JRadioButton radioButton1 = new JRadioButton("Fast Track");
+        JRadioButton radioButton2 = new JRadioButton("Thesis");
+
+        radioButton1.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                fastTrackORThesis = radioButton1.getText();
+            }
+        });
+
+        radioButton2.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                fastTrackORThesis = radioButton2.getText();
+            }
+        });
+        
+        // Add the radio buttons to a ButtonGroup so only one radio button can be selected
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(radioButton1);
+        buttonGroup.add(radioButton2);
+
+        panel.add(radioButton1);
+        panel.add(radioButton2);
+        
+        return panel; 
+    }
+    
+    //public JPanel 
+    
     /**
      * Method creates one frame and within that frame it creates multiple tables. 
      * 
