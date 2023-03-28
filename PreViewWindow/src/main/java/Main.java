@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Main {
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
         String readInTxt = ""; // Variable holds the entire content of the filePath specified Text file
         String department;
         String courseNumber;
@@ -48,7 +48,8 @@ public class Main {
             StringBuilder sringBuilder = new StringBuilder();
             String line;
 
-            while ((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) 
+            {
                 sringBuilder.append(line);
                 sringBuilder.append(System.lineSeparator()); // Append newline character after each line
             }
@@ -67,7 +68,7 @@ public class Main {
         parseTXTFILE.parseDefaultCourses(readInTxt);
         
         PreViewWindow window = new PreViewWindow(courses, parseTXTFILE.getDefaultCSTracks(), parseTXTFILE.getDefaultSETracks(), parseTXTFILE.getDefaultLeveling(),parseTXTFILE.getDefaultCoursesMap()); 
-        //parseTXTFILE.printHashMap();
+        window.getLatch().await(); // Used to make the program wait until latch has been released 
 
     }
 

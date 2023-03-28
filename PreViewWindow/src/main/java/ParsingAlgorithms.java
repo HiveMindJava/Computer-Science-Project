@@ -501,42 +501,42 @@ public class ParsingAlgorithms{
     /**
      * @return the defaultCSTracks
      */
-    public ArrayList<String> getDefaultCSTracks() {
+    public ArrayList<String> getDefaultCSTracks(){
         return defaultCSTracks;
     }
 
     /**
      * @param defaultCSTracks the defaultCSTracks to set
      */
-    public void setDefaultCSTracks(ArrayList<String> defaultCSTracks) {
+    public void setDefaultCSTracks(ArrayList<String> defaultCSTracks){
         this.defaultCSTracks = defaultCSTracks;
     }
 
     /**
      * @return the defaultSETracks
      */
-    public ArrayList<String> getDefaultSETracks() {
+    public ArrayList<String> getDefaultSETracks(){
         return defaultSETracks;
     }
 
     /**
      * @param defaultSETracks the defaultSETracks to set
      */
-    public void setDefaultSETracks(ArrayList<String> defaultSETracks) {
+    public void setDefaultSETracks(ArrayList<String> defaultSETracks){
         this.defaultSETracks = defaultSETracks;
     }
 
     /**
      * @return the defaultLeveling
      */
-    public ArrayList<String> getDefaultLeveling() {
+    public ArrayList<String> getDefaultLeveling(){
         return defaultLeveling;
     }
 
     /**
      * @param defaultLeveling the defaultLeveling to set
      */
-    public void setDefaultLeveling(ArrayList<String> defaultLeveling) {
+    public void setDefaultLeveling(ArrayList<String> defaultLeveling){
         this.defaultLeveling = defaultLeveling;
     }
 }

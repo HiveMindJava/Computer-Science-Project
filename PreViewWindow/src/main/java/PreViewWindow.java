@@ -2,8 +2,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.WindowConstants;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -11,21 +11,31 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 /**
  * This class is primarily used to display the pre-view of the selected Degree Plan using a JFrame, 
  * but it is also used to get some user input through a separate JFrame. 
  * 
  */
 public class PreViewWindow{
-    private String typeOfDegreePlan = "Intelligent Systems"; // Variable will contain the type of degree plan selected by the user 
+    private CountDownLatch latch; // Used to make the program wait until user has finished all interaction with GUIs
+    private String typeOfDegreePlan = ""; // Variable will contain the type of degree plan selected by the user 
     private String fastTrackORThesis = ""; // Variable stores the users input for either Fast Track or Thesis
     final private String CORE_COURSES_LABEL = "CORE COURSES    (15 Credit Hours)   3.19 Grade Point Average Required";
     final private String APPROVED_6000_LEVEL_ELECTIVES_LABEL = "FIVE APPROVED 6000 LEVEL ELECTIVES    (15 * Credit Hours)    3.0 Grade Point Average";
@@ -39,19 +49,26 @@ public class PreViewWindow{
     final private String SYSTEMS = "Systems";
     final private String TRADITIONAL_COMPUTER_SCIENCE = "Traditional Computer Science";
     final private String SOFTWARE_ENGINEERING = "Software Engineering";
+    private String selectedTrack = null; // Variable will store the specific Masters track 
     private ArrayList<String> defaultCSTracks = new ArrayList<>(); // ArrayList will store the CS tracks available 
     private ArrayList<String> defaultSETracks = new ArrayList<>(); // ArrayList will store the SE tracks available 
     private ArrayList<String> defaultLeveling = new ArrayList<>(); // ArrayList will store the leveling courses/pre-requisites that are possible 
     private ArrayList<Course> coursesList; // ArrayList contains all the courses read-in from the transcript after some filtering
     private HashMap<String, ArrayList<Course>> defaultCoursesMap; // Hashmap stores the default courses found in the Default.txt file
                                                                   // with the key being the type of track the courses fall under 
+    
     /**
-     * Constructor. 
+     * Constructor.
      * 
-     * @param courses 
+     * @param courses
+     * @param defaultCSTracks
+     * @param defaultSETracks
+     * @param defaultLeveling
+     * @param hashMap 
      */
     public PreViewWindow(ArrayList<Course> courses, ArrayList<String> defaultCSTracks, ArrayList<String> defaultSETracks, ArrayList<String> defaultLeveling, 
             HashMap<String, ArrayList<Course>> hashMap){
+        setLatch(new CountDownLatch(1));
         this.coursesList = new ArrayList<>(courses); 
         this.defaultCSTracks = new ArrayList<String>(defaultCSTracks);
         this.defaultSETracks = new ArrayList<String>(defaultSETracks);
@@ -62,9 +79,6 @@ public class PreViewWindow{
             createUserInputFrame();
         });
         
-//        SwingUtilities.invokeLater(() -> {
-//            createFrameAndTables();
-//        });
     }
 
     /**
@@ -72,19 +86,51 @@ public class PreViewWindow{
      * 
      */
     public void createUserInputFrame(){
+        int choice = CS_or_SE();
+        
         JFrame frame = new JFrame("User Input Frame"); // Creates a new JFrame. This will act as the sole frame to display the 
                                                        // frame that will accept user input  
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+                                                       
+        frame.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e){
+                //SwingUtilities.invokeLater(PreViewWindow.this::createFrameAndTables);
+                SwingUtilities.invokeLater(() -> {
+                    createFrameAndTables();
+                });
+            }
+        });
 
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel mainPanel = new JPanel(new BorderLayout());  // Create a new JPanel to act as my main panel in the frame
-        //JPanel container = new JPanel(new GridLayout(3, 2)); // Creates a new JPanel with a GridLayout of two columns and three rows.
-        
         mainPanel.add(fastTrackORThesis(), BorderLayout.NORTH);
+        mainPanel.add(specificTrack(choice), BorderLayout.CENTER); 
         
         frame.getContentPane().add(mainPanel); // Add the mainPanel to the content pane of the JFrame
         frame.pack(); // Pack the frame, which sets its size to the preferred size of its components
         frame.setVisible(true); // Make the frame visible 
+    }
+    
+    /**
+     * Method is used to display a dialogue box where the user can select what track category to use. 
+     * 
+     * @return an int representing the chosen option: [1] Computer Science Track, [2] Software Engineering Track
+     */
+    public int CS_or_SE(){
+        String[] options = {"[1] Computer Science Track", "[2] Software Engineering Track"};
         
+        // Create dialog box 
+        int choice = JOptionPane.showOptionDialog(null, "Please choose an option:",
+                "Options", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options, options[0]);
+
+        // Executes if the user closes the dialog box, result is exit program
+        if (choice == JOptionPane.CLOSED_OPTION) 
+        {
+            System.exit(0);
+        }
+        
+        return choice + 1; 
     }
     
     /**
@@ -102,14 +148,14 @@ public class PreViewWindow{
         radioButton1.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                fastTrackORThesis = radioButton1.getText();
+                setFastTrackORThesis(radioButton1.getText());
             }
         });
 
         radioButton2.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                fastTrackORThesis = radioButton2.getText();
+                setFastTrackORThesis(radioButton2.getText());
             }
         });
         
@@ -124,7 +170,127 @@ public class PreViewWindow{
         return panel; 
     }
     
-    //public JPanel 
+    /**
+     * Method creates a GUI panel for displaying and manipulating a list of possible tracks.
+     * Note that the list of possible tracks to display and manipulate depends on the trackCategory value being passed in.
+     * 
+     * @param trackCategory
+     * @return the GUI panel for displaying and manipulating a list of possible tracks
+     */
+    public JPanel specificTrack(int trackCategory){
+        JPanel panel = new JPanel(); // Create new JPanel
+        
+        DefaultListModel<String> listModel = new DefaultListModel<String>();  // Create a new DefaultListModel to store the items in the JList
+        JList<String> trackList = new JList<String>(listModel); // Create a new JList and initialize it with the DefaultListModel
+        
+        JTextField newTrackField = new JTextField(30); // Create a new JTextField for entering new courses to be added to the list.
+                                                       // Text field will be able to display up to 30 characters of text at a time
+        
+        // Create necessary buttons 
+        JButton selectButton = new JButton("Select");
+        JButton deleteButton = new JButton("Delete");
+        JButton addButton = new JButton("Add");
+        
+        // List of possible tracks to display and manipulate depends on the trackCategory value
+        if (trackCategory == 1)
+        {
+            for (String course : defaultCSTracks) // Add the CS tracks to the list model
+            {
+                listModel.addElement(course);
+            }
+        }
+        else
+        {
+            for (String course : defaultSETracks) // Add the SE tracks to the list model
+            {
+                listModel.addElement(course);
+            }
+        }
+        
+        JLabel selectedLabel = new JLabel("Selected track: None");
+
+        // Selection listener for trackList
+        trackList.addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent e){
+                selectButton.setEnabled(true);
+                deleteButton.setEnabled(true);
+                setSelectedTrack(trackList.getSelectedValue());
+                selectedLabel.setText("Selected track: None");
+            }
+        });
+
+        // Action listener to the selectButton
+        selectButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (getSelectedTrack() != null) 
+                {
+                    setTypeOfDegreePlan(getSelectedTrack());
+                    selectedLabel.setText("Selected track: " + getSelectedTrack());
+                }
+            }
+        });
+
+        // Action listener to the deleteButton
+        deleteButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                String selectedTrack = trackList.getSelectedValue();
+                listModel.removeElement(selectedTrack);
+                
+                if (trackCategory == 1)
+                {
+                    defaultCSTracks.remove(selectedTrack);
+                }
+                else 
+                {
+                    defaultSETracks.remove(selectedTrack);
+                }
+            }
+        });
+
+        // Action listener to the addButton
+        addButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                String newCourse = newTrackField.getText();
+                if (!newCourse.isEmpty()) 
+                {
+                    listModel.addElement(newCourse);
+                    
+                    if (trackCategory == 1) 
+                    {
+                        defaultCSTracks.add(newCourse);
+                    } 
+                    else 
+                    {
+                        defaultSETracks.add(newCourse);
+                    }
+                    
+                    newTrackField.setText("");
+                }
+            }
+        });
+
+        // Create a scroll pane that contains the trackList
+        JScrollPane scrollPane = new JScrollPane(trackList);
+
+        // Add the GUI components to the panel
+        panel.setLayout(new BorderLayout());
+        panel.add(scrollPane, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(selectButton);
+        buttonPanel.add(deleteButton);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add the text field and add button to the GUI
+        JPanel addPanel = new JPanel();
+        addPanel.add(newTrackField);
+        addPanel.add(addButton);
+        panel.add(addPanel, BorderLayout.NORTH);
+
+        // Add the selectedLabel to the GUI
+        panel.add(selectedLabel, BorderLayout.WEST);
+   
+        return panel; 
+    }
     
     /**
      * Method creates one frame and within that frame it creates multiple tables. 
@@ -133,7 +299,6 @@ public class PreViewWindow{
     public void createFrameAndTables(){
         JFrame frame = new JFrame("Pre-view of Degree Plan"); // Creates a new JFrame. This will act as the sole frame to display the 
                                                               // pre-view of the needed Degree Plan  
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         int intFlag; // Variable is a integer flag used to distinguish between groups of degree plan types  
 
         JPanel mainPanel = new JPanel(new BorderLayout());  // Create a new JPanel to act as my main panel in the frame
@@ -141,11 +306,11 @@ public class PreViewWindow{
                                                                   // This is needed to display all the tables appropriately 
         
         // Check the type of degree plan 
-        if (typeOfDegreePlan.equals(DATA_SCIENCE) || typeOfDegreePlan.equals(INTELLIGENT_SYSTEMS) || typeOfDegreePlan.equals(INTERACTIVE_COMPUTING)
-                || typeOfDegreePlan.equals(SYSTEMS) || typeOfDegreePlan.equals(TRADITIONAL_COMPUTER_SCIENCE)) 
+        if (getTypeOfDegreePlan().equals(DATA_SCIENCE) || getTypeOfDegreePlan().equals(INTELLIGENT_SYSTEMS) || getTypeOfDegreePlan().equals(INTERACTIVE_COMPUTING)
+                || getTypeOfDegreePlan().equals(SYSTEMS) || getTypeOfDegreePlan().equals(TRADITIONAL_COMPUTER_SCIENCE)) 
         {
-            final int numberOfTables = 6;
-            JPanel[] tablePanels = new JPanel[numberOfTables]; // Array used to hold 6 table panels 
+            final int NUM_OF_TABLES = 6;
+            JPanel[] tablePanels = new JPanel[NUM_OF_TABLES]; // Array used to hold 6 table panels 
             intFlag = 1;
 
             // Create table panels and add them to the array
@@ -155,22 +320,22 @@ public class PreViewWindow{
             }
             
             // Add the table panels to the table container
-            for (int i = 0; i < tablePanels.length; i++) 
+            for (int ix = 0; ix < tablePanels.length; ix++) 
             {
-                tableContainer.add(tablePanels[i]);
+                tableContainer.add(tablePanels[ix]);
             }
 
             // Add the table container to the main panel
             mainPanel.add(tableContainer, BorderLayout.CENTER);
         } 
-        else if (typeOfDegreePlan.equals(CYBER_SECURITY)) // Check the type of degree plan 
+        else if (getTypeOfDegreePlan().equals(CYBER_SECURITY)) // Check the type of degree plan 
         {
-            final int numberOfTables = 6;
-            JPanel[] tablePanels = new JPanel[numberOfTables]; // Array used to hold 6 table panels
+            final int NUM_OF_TABLES = 6;
+            JPanel[] tablePanels = new JPanel[NUM_OF_TABLES]; // Array used to hold 6 table panels
             intFlag = 2;
 
             // Create table panels and add them to the array
-            for (int ix = 1; ix < tablePanels.length; ix++)
+            for (int ix = 0; ix < tablePanels.length; ix++)
             {
                 tablePanels[ix] = createTablePanel(intFlag, ix); // Method call
             }
@@ -184,14 +349,14 @@ public class PreViewWindow{
             // Add the table container to the main panel
             mainPanel.add(tableContainer, BorderLayout.CENTER);
         } 
-        else if (typeOfDegreePlan.equals(NETWORKS_AND_TELECOMMUNICATIONS) || typeOfDegreePlan.equals(SOFTWARE_ENGINEERING)) // Check the type of degree plan 
+        else if (getTypeOfDegreePlan().equals(NETWORKS_AND_TELECOMMUNICATIONS) || getTypeOfDegreePlan().equals(SOFTWARE_ENGINEERING)) // Check the type of degree plan 
         {
-            final int numberOfTables = 5;
-            JPanel[] tablePanels = new JPanel[numberOfTables]; // Array used to hold 5 table panels
+            final int NUM_OF_TABLES = 5;
+            JPanel[] tablePanels = new JPanel[NUM_OF_TABLES]; // Array used to hold 5 table panels
             intFlag = 3;
 
             // Create table panels and add them to the array
-            for (int ix = 1; ix < tablePanels.length; ix++)
+            for (int ix = 0; ix < tablePanels.length; ix++)
             {
                 tablePanels[ix] = createTablePanel(intFlag, ix); // Method call
             }
@@ -204,6 +369,34 @@ public class PreViewWindow{
             // Add the table container to the main panel
             mainPanel.add(tableContainer, BorderLayout.CENTER);
         }
+        else // Create generic table for degree plans not given during the time of @rkg190000 coding this Class 
+        {
+            final int NUM_OF_TABLES = 6;
+            JPanel[] tablePanels = new JPanel[NUM_OF_TABLES]; // Array used to hold 6 table panels
+            intFlag = 4;
+
+            // Create table panels and add them to the array
+            for (int ix = 0; ix < tablePanels.length; ix++)
+            {
+                tablePanels[ix] = createTablePanel(intFlag, ix); // Method call
+            }
+
+            // Add the table panels to the table container
+            for (int ix = 0; ix < tablePanels.length; ix++)
+            {
+                tableContainer.add(tablePanels[ix]);
+            }
+
+            // Add the table container to the main panel
+            mainPanel.add(tableContainer, BorderLayout.CENTER);
+        }
+        
+        frame.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e){
+                latch.countDown(); // Remove latch
+            }
+        });
         
         // Create a new JScrollPane and add the mainPanel (which contains the tableContainer) to it
         JScrollPane scrollPane = new JScrollPane(mainPanel); // The new JScrollPane object is used to make the frame scrollable using scroll bar 
@@ -304,7 +497,7 @@ public class PreViewWindow{
     public void labelsForTables(int intFlag, int degreePlanSection, JPanel labelPanel){
         JLabel label = new JLabel(); // Create JLabel object.  
         
-        if (intFlag == 1) // Via a integer flag a check is done to see if the degree plan is one of the following: 
+        if (intFlag == 1) // Via a integer flag, a check is done to see if the degree plan is one of the following: 
                           // Data Science, Intelligent Systems, Interactive Computing, Systems, or Traditional Computer Science
         {
             if (degreePlanSection == 0) // Check if the section/table needing a label is the first one 
@@ -316,15 +509,15 @@ public class PreViewWindow{
             else if (degreePlanSection == 1) // Check if the section/table needing a label is the second one
             {
                 // Different labels are needed for this section/table dependent on the type of degree plan 
-                if (typeOfDegreePlan.equals(DATA_SCIENCE) || typeOfDegreePlan.equals(INTELLIGENT_SYSTEMS) || typeOfDegreePlan.equals(SYSTEMS))
+                if (getTypeOfDegreePlan().equals(DATA_SCIENCE) || getTypeOfDegreePlan().equals(INTELLIGENT_SYSTEMS) || getTypeOfDegreePlan().equals(SYSTEMS))
                 {
                     label = new JLabel("One of the Following Courses");
                 } 
-                else if (typeOfDegreePlan.equals(INTERACTIVE_COMPUTING))
+                else if (getTypeOfDegreePlan().equals(INTERACTIVE_COMPUTING))
                 {
                     label = new JLabel("Three of the Following Courses");
                 }
-                else if (typeOfDegreePlan.equals(TRADITIONAL_COMPUTER_SCIENCE)) 
+                else if (getTypeOfDegreePlan().equals(TRADITIONAL_COMPUTER_SCIENCE)) 
                 {
                     label = new JLabel("Two of the Following Courses");
                 }
@@ -351,7 +544,7 @@ public class PreViewWindow{
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
             }
         } 
-        else if (intFlag == 2) // Via a integer flag a check is done to see if the degree plan is one of the following: 
+        else if (intFlag == 2) // Via a integer flag, a check is done to see if the degree plan is one of the following: 
                                // Cyber Security 
         {
             if (degreePlanSection == 0) // Check if the section/table needing a label is the first one
@@ -389,10 +582,9 @@ public class PreViewWindow{
                 label = new JLabel("No 5XXX courses can be applied to this degree plan");
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
-
             }
         }
-        else if (intFlag == 3) // Via a integer flag a check is done to see if the degree plan is one of the following: 
+        else if (intFlag == 3) // Via a integer flag, a check is done to see if the degree plan is one of the following: 
                                // Networks and Telecommunications, or Software Engineering
         {
             if (degreePlanSection == 0) // Check if the section/table needing a label is the first one
@@ -408,7 +600,7 @@ public class PreViewWindow{
                 labelPanel.add(label, BorderLayout.NORTH);
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
                 
-                if (typeOfDegreePlan.equals(SOFTWARE_ENGINEERING)) // An extra label is added if condition is true
+                if (getTypeOfDegreePlan().equals(SOFTWARE_ENGINEERING)) // An extra label is added if condition is true
                 {
                     label = new JLabel("CS 6359 cannot be used on this degree plan");
                     labelPanel.add(label, BorderLayout.CENTER);
@@ -427,5 +619,95 @@ public class PreViewWindow{
                 labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
             }
         }
+        else if (intFlag == 4) // Via a integer flag, a check is done to see if the degree plan is one that was not present when 
+                               // @rkg190000 coded this Class
+        {
+            if (degreePlanSection == 0) // Check if the section/table needing a label is the first one
+            {
+                label = new JLabel("CORE COURSES");
+                labelPanel.add(label, BorderLayout.NORTH);
+                labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding 
+            }
+            else if (degreePlanSection == 1) // Check if the section/table needing a label is the second one
+            {
+                label = new JLabel("X Number of the Following Courses");
+                labelPanel.add(label, BorderLayout.NORTH);
+                labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
+            } 
+            else if (degreePlanSection == 2) // Check if the section/table needing a label is the third one
+            {
+                label = new JLabel("APPROVED X000 LEVEL ELECTIVES");
+                labelPanel.add(label, BorderLayout.NORTH);
+                labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
+            }
+            else if (degreePlanSection == 3) // Check if the section/table needing a label is the fourth one
+            {
+                label = new JLabel("ADDITIONAL ELECTIVES");
+                labelPanel.add(label, BorderLayout.NORTH);
+                labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
+            }
+            else if (degreePlanSection == 4) // Check if the section/table needing a label is the fifth one
+            {
+                label = new JLabel(OTHER_REQUIREMENTS);
+                labelPanel.add(label, BorderLayout.NORTH);
+                labelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adds padding
+            } 
+        }
+    }
+
+    /**
+     * @return the typeOfDegreePlan
+     */
+    public String getTypeOfDegreePlan(){
+        return typeOfDegreePlan;
+    }
+
+    /**
+     * @param typeOfDegreePlan the typeOfDegreePlan to set
+     */
+    public void setTypeOfDegreePlan(String typeOfDegreePlan){
+        this.typeOfDegreePlan = typeOfDegreePlan;
+    }
+
+    /**
+     * @return the fastTrackORThesis
+     */
+    public String getFastTrackORThesis(){
+        return fastTrackORThesis;
+    }
+
+    /**
+     * @param fastTrackORThesis the fastTrackORThesis to set
+     */
+    public void setFastTrackORThesis(String fastTrackORThesis){
+        this.fastTrackORThesis = fastTrackORThesis;
+    }
+
+    /**
+     * @return the selectedTrack
+     */
+    public String getSelectedTrack(){
+        return selectedTrack;
+    }
+
+    /**
+     * @param selectedTrack the selectedTrack to set
+     */
+    public void setSelectedTrack(String selectedTrack){
+        this.selectedTrack = selectedTrack;
+    }
+    
+    /**
+     * @return the latch
+     */
+    public CountDownLatch getLatch(){
+        return latch;
+    }
+
+    /**
+     * @param latch the latch to set
+     */
+    public void setLatch(CountDownLatch latch){
+        this.latch = latch;
     }
 }
